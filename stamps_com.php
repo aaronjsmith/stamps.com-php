@@ -2,13 +2,13 @@
 
 class stamps_com
 {
-    private $Authenticator;
+    private $authenticator;
 
     //API LOGIN
-    private $IntegrationID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    private $Username = "XXXXXXXXXXXXXXX";
-    private $Password = "XXXXXXXXXXXXXXX";
-    private $wsdl = "https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl";
+    private $integrationID;
+    private $username;
+    private $password;
+    private $wsdl;
 
     public $client;
 
@@ -26,29 +26,63 @@ class stamps_com
         "US-LM"     =>  "USPS Library Mail"
     );
 
-    public function __construct()
+    public function __construct($wsdl, $integrationID, $username, $password)
     {
+        $this->setWsdl($wsdl);
+        $this->setIntegrationId($integrationID);
+        $this->setUsername($username);
+        $this->setPassword($password);
         $this->connect();
     }
 
-    public function connect()
+    private function connect()
     {
         $authData = array(
             "Credentials"       => array(
-                "IntegrationID"     => $this->IntegrationID,
-                "Username"          => $this->Username,
-                "Password"          => $this->Password
+                "IntegrationID"     => $this->integrationID,
+                "Username"          => $this->username,
+                "Password"          => $this->password
         ));
 
         $this->client = new SoapClient('https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl');
         $auth = $this->client->AuthenticateUser($authData);
-        $this->Authenticator = $auth->Authenticator;
+        $this->authenticator = $auth->Authenticator;
+    }
+
+    private function setIntegrationId($id)
+    {
+        $this->integrationId = $id;
+    }
+
+    private function getIntegrationId()
+    {
+        return $this->integrationId;
+    }
+
+    private function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    private function getUsername()
+    {
+        return $this->username;
+    }
+
+    private function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    private function getPassword()
+    {
+        return $this->password;
     }
 
     public function GetRates($FromZIPCode, $ToZIPCode = null, $ToCountry = null, $WeightLb, $Length, $Width, $Height, $PackageType, $ShipDate, $InsuredValue, $ToState = null)
     {
         $data = array(
-                "Authenticator"     => $this->Authenticator,
+                "Authenticator"     => $this->authenticator,
                 "Rate" => array(
                     "FromZIPCode" => $FromZIPCode,
                     "WeightLb" => $WeightLb,
@@ -100,5 +134,10 @@ class stamps_com
     }
 }
 
-$stamps_com = new stamps_com;
+$wsdl           = "https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl";
+$integrationID  = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+$username       = "xxxxx-xxx";
+$password       = "xxxxxxxxxxx";
+
+$stamps_com = new stamps_com($wsdl, $integrationID, $username, $password);
 $stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", "2014-10-28", '100', null);

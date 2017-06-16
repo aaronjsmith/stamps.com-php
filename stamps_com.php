@@ -26,13 +26,14 @@ class stamps_com
         "US-LM" =>  "USPS Library Mail"
     );
 
-    function __construct()
+    public function __construct()
     {
         $this->connect();
-        $this->GetRates("90210","90210",null,"10",6,6,6,"Package","2014-10-28",'100',null);
+        $this->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", "2014-10-28", '100', null);
     }
 
-    function connect(){
+    public function connect()
+    {
         $authData = array(
             "Credentials"       => array(
                 "IntegrationID"     => $this->IntegrationID,
@@ -45,7 +46,8 @@ class stamps_com
         $this->Authenticator = $auth->Authenticator;
     }
 
-    function GetRates($FromZIPCode,$ToZIPCode = null,$ToCountry = null,$WeightLb,$Length,$Width,$Height,$PackageType,$ShipDate,$InsuredValue,$ToState = null){
+    public function GetRates($FromZIPCode, $ToZIPCode = null, $ToCountry = null, $WeightLb, $Length, $Width, $Height, $PackageType, $ShipDate, $InsuredValue, $ToState = null)
+    {
         $data = array(
                 "Authenticator"     => $this->Authenticator,
                 "Rate" => array(
@@ -60,13 +62,13 @@ class stamps_com
                 )
         );
 
-        if($ToZIPCode == null && $ToCountry != null){
+        if ($ToZIPCode == null && $ToCountry != null) {
             $data["Rate"]['ToCountry'] = $ToCountry;
-        }else{
+        } else {
             $data["Rate"]['ToZIPCode'] = $ToZIPCode;
         }
 
-        if($ToState != null){
+        if ($ToState != null) {
             $data["Rate"]['ToState'] = $ToState;
         }
 
@@ -80,7 +82,7 @@ class stamps_com
                 $result[$k][$kk] = $v->$kk;
             }
 
-             $result[$k] =  $result[$k] + array(
+            $result[$k] =  $result[$k] + array(
                 "ServiceType" => $this->ServiceType[$v->ServiceType],
                 "Amount" => $v->Amount,
                 "PackageType" => $v->PackageType,

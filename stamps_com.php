@@ -13,23 +13,22 @@ class stamps_com
     public $client;
 
     public $ServiceType = array(
-        "US-FC" =>  "USPS First-Class Mail",
-        "US-MM" =>  "USPS Media Mail",
-        "US-PP" =>  "USPS Parcel Post ",
-        "US-PM" =>  "USPS Priority Mail",
-        "US-XM" =>  "USPS Priority Mail Express",
-        "US-EMI" =>  "USPS Priority Mail Express International",
-        "US-PMI" =>  "USPS Priority Mail International",
-        "US-FCI" =>  "USPS First Class Mail International",
-        "US-CM" =>  "USPS Critical Mail",
-        "US-PS" =>  "USPS Parcel Select",
-        "US-LM" =>  "USPS Library Mail"
+        "US-FC"     =>  "USPS First-Class Mail",
+        "US-MM"     =>  "USPS Media Mail",
+        "US-PP"     =>  "USPS Parcel Post",
+        "US-PM"     =>  "USPS Priority Mail",
+        "US-XM"     =>  "USPS Priority Mail Express",
+        "US-EMI"    =>  "USPS Priority Mail Express International",
+        "US-PMI"    =>  "USPS Priority Mail International",
+        "US-FCI"    =>  "USPS First Class Mail International",
+        "US-CM"     =>  "USPS Critical Mail",
+        "US-PS"     =>  "USPS Parcel Select",
+        "US-LM"     =>  "USPS Library Mail"
     );
 
     public function __construct()
     {
         $this->connect();
-        $this->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", "2014-10-28", '100', null);
     }
 
     public function connect()
@@ -102,3 +101,4 @@ class stamps_com
 }
 
 $stamps_com = new stamps_com;
+$stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", "2014-10-28", '100', null);

@@ -8,18 +8,11 @@ class stamps_com
     private $IntegrationID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     private $Username = "XXXXXXXXXXXXXXX";
     private $Password = "XXXXXXXXXXXXXXX";
-
     private $wsdl = "https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl";
 
     public $client;
 
-    public $output;
-    //public $functions;
-    //public $types;
-
-
     public $ServiceType = array(
-
         "US-FC" =>  "USPS First-Class Mail",
         "US-MM" =>  "USPS Media Mail",
         "US-PP" =>  "USPS Parcel Post ",
@@ -37,17 +30,9 @@ class stamps_com
     {
         $this->connect();
         $this->GetRates("90210","90210",null,"10",6,6,6,"Package","2014-10-28",'100',null);
-
-        //echo "<pre>";
-        //print_r($this);
-
     }
 
-
-
-
     function connect(){
-
         $authData = array(
             "Credentials"       => array(
                 "IntegrationID"     => $this->IntegrationID,
@@ -58,20 +43,10 @@ class stamps_com
         $this->client = new SoapClient('https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl');
         $auth = $this->client->AuthenticateUser($authData);
         $this->Authenticator = $auth->Authenticator;
-
-        //$this->functions = $this->client->__getFunctions();
-        //$this->types = $this->client->__getTypes();
-
     }
 
     function GetRates($FromZIPCode,$ToZIPCode = null,$ToCountry = null,$WeightLb,$Length,$Width,$Height,$PackageType,$ShipDate,$InsuredValue,$ToState = null){
-
-
-
-
-
         $data = array(
-
                 "Authenticator"     => $this->Authenticator,
                 "Rate" => array(
                     "FromZIPCode" => $FromZIPCode,
@@ -82,9 +57,7 @@ class stamps_com
                     "PackageType" => $PackageType,
                     "ShipDate" => $ShipDate,
                     "InsuredValue" => $InsuredValue
-
                 )
-
         );
 
         if($ToZIPCode == null && $ToCountry != null){
@@ -103,7 +76,6 @@ class stamps_com
         echo "<pre>";
 
         foreach ($r as $k => $v) {
-
             foreach ($data['Rate'] as $kk => $vv) {
                 $result[$k][$kk] = $v->$kk;
             }
@@ -120,43 +92,11 @@ class stamps_com
                 "DeliveryDate" => $v->DeliveryDate,
                 "RateCategory" => $v->RateCategory,
                 "ToState" => $v->ToState,
-
-
-
             );
-
-
         }
 
-
         print_r($result);
-
-
-
-
     }
 }
 
 $stamps_com = new stamps_com;
-
-
-
-
-
-
-
-// echo "<pre>";
-// echo "<h3>Main Output</h3>";
-// print_r($auth);
-
-
-
-// echo "<hr>";
-// echo "<pre>";
-// echo "<h3>Functions</h3>";
-// print_r($client->__getFunctions());
-
-
-// echo "<h3>Types</h3>";
-// print_r($client->__getTypes()); 
-

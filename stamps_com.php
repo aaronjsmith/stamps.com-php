@@ -84,13 +84,13 @@ class stamps_com
                 "Width" => $v->Width,
                 "Height" => $v->Height,
                 "ShipDate" => $v->ShipDate,
-		"DeliveryDate" => property_exists($v, 'DeliveryDate') ? $v->DeliveryDate : 'Unavailable',
+                "DeliveryDate" => property_exists($v, 'DeliveryDate') ? $v->DeliveryDate : 'Unavailable',
                 "RateCategory" => $v->RateCategory,
                 "ToState" => $v->ToState,
             );
         }
-	
-	return $result;
+
+    return $result;
     }
 }
 
@@ -101,8 +101,8 @@ $password       = "xxxxxxxxxxx";
 
 $stamps_com = new stamps_com($wsdl, $integrationID, $username, $password);
 
-$shipDate	= date('Y-m-d');
-$rates		= $stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", $shipDate, '100', null);
+$shipDate   = date('Y-m-d');
+$rates      = $stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", $shipDate, '100', null);
 
 echo '<pre>';
 print_r($rates);

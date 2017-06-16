@@ -89,9 +89,8 @@ class stamps_com
                 "ToState" => $v->ToState,
             );
         }
-
-        echo "<pre>";
-        print_r($result);
+	
+	return $result;
     }
 }
 

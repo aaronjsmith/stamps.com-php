@@ -11,6 +11,7 @@ class stamps_com
     private $wsdl;
 
     public $client;
+    public $account;
 
     public $ServiceType = array(
         "US-FC"     =>  "USPS First-Class Mail",
@@ -33,6 +34,13 @@ class stamps_com
         $this->setUsername($username);
         $this->setPassword($password);
         $this->connect();
+        $this->setAccount();
+    }
+
+    private function makeCall($method, $data) {
+        $result = $this->client->$method($data);
+        $this->authenticator = $result->Authenticator;
+        return $result;
     }
 
     private function connect()

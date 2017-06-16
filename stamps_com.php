@@ -100,4 +100,9 @@ $username       = "xxxxx-xxx";
 $password       = "xxxxxxxxxxx";
 
 $stamps_com = new stamps_com($wsdl, $integrationID, $username, $password);
-$stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", "2014-10-28", '100', null);
+
+$shipDate	= date('Y-m-d');
+$rates		= $stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", $shipDate, '100', null);
+
+echo '<pre>';
+print_r($rates);

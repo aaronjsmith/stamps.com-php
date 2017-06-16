@@ -84,7 +84,7 @@ class stamps_com
                 "Width" => $v->Width,
                 "Height" => $v->Height,
                 "ShipDate" => $v->ShipDate,
-                "DeliveryDate" => $v->DeliveryDate,
+		"DeliveryDate" => property_exists($v, 'DeliveryDate') ? $v->DeliveryDate : 'Unavailable',
                 "RateCategory" => $v->RateCategory,
                 "ToState" => $v->ToState,
             );

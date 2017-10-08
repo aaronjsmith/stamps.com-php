@@ -2,161 +2,107 @@
 
 class stamps_com
 {
-	private $Authenticator;
+    private $authenticator;
+    private $client;
+    private $account;
 
-	//API LOGIN
-	private $IntegrationID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-	private $Username = "XXXXXXXXXXXXXXX";
-	private $Password = "XXXXXXXXXXXXXXX";
+    private $ServiceType = array(
+        "US-FC"     =>  "USPS First-Class Mail",
+        "US-MM"     =>  "USPS Media Mail",
+        "US-PP"     =>  "USPS Parcel Post",
+        "US-PM"     =>  "USPS Priority Mail",
+        "US-XM"     =>  "USPS Priority Mail Express",
+        "US-EMI"    =>  "USPS Priority Mail Express International",
+        "US-PMI"    =>  "USPS Priority Mail International",
+        "US-FCI"    =>  "USPS First Class Mail International",
+        "US-CM"     =>  "USPS Critical Mail",
+        "US-PS"     =>  "USPS Parcel Select",
+        "US-LM"     =>  "USPS Library Mail"
+    );
 
-	private $wsdl = "https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl";
+    public function __construct($wsdl, $integrationID, $username, $password)
+    {
+        $this->client = new SoapClient($wsdl);
 
-	public $client;
+        $authData = [
+            "Credentials"   => [
+                "IntegrationID"     => $integrationID,
+                "Username"          => $username,
+                "Password"          => $password
+            ]
+        ];
 
-	public $output;
-	//public $functions;
-	//public $types;
+        $this->makeCall('AuthenticateUser', $authData);
+        $this->account = $this->makeCall('GetAccountInfo', ["Authenticator" => $this->authenticator]);
+    }
 
+    private function makeCall($method, $data) {
+        $result = $this->client->$method($data);
+        $this->authenticator = $result->Authenticator;
+        return $result;
+    }
 
-	public $ServiceType = array(
+    public function GetRates($FromZIPCode, $ToZIPCode = null, $ToCountry = null, $WeightLb, $Length, $Width, $Height, $PackageType, $ShipDate, $InsuredValue, $ToState = null)
+    {
+        $data = [
+            "Authenticator" => $this->authenticator,
+            "Rate"      => [
+                "FromZIPCode"   => $FromZIPCode,
+                "WeightLb"  => $WeightLb,
+                "Length"    => $Length,
+                "Width"     => $Width,
+                "Height"    => $Height,
+                "PackageType"   => $PackageType,
+                "ShipDate"  => $ShipDate,
+                "InsuredValue"  => $InsuredValue
+            ]
+        ];
 
-		"US-FC" =>  "USPS First-Class Mail",
-		"US-MM" =>  "USPS Media Mail",
-		"US-PP" =>  "USPS Parcel Post ",
-		"US-PM" =>  "USPS Priority Mail",
-		"US-XM" =>  "USPS Priority Mail Express",
-		"US-EMI" =>  "USPS Priority Mail Express International",
-		"US-PMI" =>  "USPS Priority Mail International",
-		"US-FCI" =>  "USPS First Class Mail International",
-		"US-CM" =>  "USPS Critical Mail",
-		"US-PS" =>  "USPS Parcel Select",
-		"US-LM" =>  "USPS Library Mail"
-	);
-	
-	function __construct()
-	{
-		$this->connect();
-		$this->GetRates("90210","90210",null,"10",6,6,6,"Package","2014-10-28",'100',null);
-		
-		//echo "<pre>";
-		//print_r($this);
+        if ($ToZIPCode == null && $ToCountry != null) {
+            $data["Rate"]['ToCountry'] = $ToCountry;
+        } else {
+            $data["Rate"]['ToZIPCode'] = $ToZIPCode;
+        }
 
-	}
+        if ($ToState != null) {
+            $data["Rate"]['ToState'] = $ToState;
+        }
 
+        $rates = $this->makeCall('getRates', $data)->Rates->Rate;
 
+        foreach ($rates as $k => $v) {
+            foreach ($data['Rate'] as $kk => $vv) {
+                $result[$k][$kk] = $v->$kk;
+            }
 
+            $result[$k] =  $result[$k] + array(
+                "ServiceType" => $this->ServiceType[$v->ServiceType],
+                "Amount" => $v->Amount,
+                "PackageType" => $v->PackageType,
+                "WeightLb" => $v->WeightLb,
+                "Length" => $v->Length,
+                "Width" => $v->Width,
+                "Height" => $v->Height,
+                "ShipDate" => $v->ShipDate,
+                "DeliveryDate" => property_exists($v, 'DeliveryDate') ? $v->DeliveryDate : 'Unavailable',
+                "RateCategory" => $v->RateCategory,
+                "ToState" => $v->ToState,
+            );
+        }
 
-	function connect(){
-
-		$authData = array(
-		    "Credentials"       => array(
-		        "IntegrationID"     => $this->IntegrationID,
-		        "Username"          => $this->Username,
-		        "Password"          => $this->Password
-		));
-
-		$this->client = new SoapClient('https://swsim.testing.stamps.com/swsim/swsimv38.asmx?wsdl');
-		$auth = $this->client->AuthenticateUser($authData);
-		$this->Authenticator = $auth->Authenticator;
-
-		//$this->functions = $this->client->__getFunctions();
-		//$this->types = $this->client->__getTypes();
-
-	}
-
-	function GetRates($FromZIPCode,$ToZIPCode = null,$ToCountry = null,$WeightLb,$Length,$Width,$Height,$PackageType,$ShipDate,$InsuredValue,$ToState = null){
-
-
-
-
-
-		$data = array(
-		    
-		        "Authenticator"     => $this->Authenticator,
-		        "Rate" => array(
-		        	"FromZIPCode" => $FromZIPCode,
-					"WeightLb" => $WeightLb,
-					"Length" => $Length,
-					"Width" => $Width,
-					"Height" => $Height,
-					"PackageType" => $PackageType,
-					"ShipDate" => $ShipDate,
-					"InsuredValue" => $InsuredValue
-
-		       	)
-			
-		);
-
-		if($ToZIPCode == null && $ToCountry != null){
-			$data["Rate"]['ToCountry'] = $ToCountry;
-		}else{
-			$data["Rate"]['ToZIPCode'] = $ToZIPCode;
-		}
-
-		if($ToState != null){
-			$data["Rate"]['ToState'] = $ToState;
-		}
-
-		$r = $this->client->GetRates($data);
-		$r = $r->Rates->Rate;
-
-		echo "<pre>";
-
-		foreach ($r as $k => $v) {
-			
-			foreach ($data['Rate'] as $kk => $vv) {
-				$result[$k][$kk] = $v->$kk;
-			}
-
-			 $result[$k] =  $result[$k] + array(
-			 	"ServiceType" => $this->ServiceType[$v->ServiceType],
-			 	"Amount" => $v->Amount,
-			 	"PackageType" => $v->PackageType,
-			 	"WeightLb" => $v->WeightLb,
-			 	"Length" => $v->Length,
-			 	"Width" => $v->Width,
-			 	"Height" => $v->Height,
-			 	"ShipDate" => $v->ShipDate,
-			 	"DeliveryDate" => $v->DeliveryDate,
-			 	"RateCategory" => $v->RateCategory,
-			 	"ToState" => $v->ToState,
-
-
-				
-			);
-
-			
-		}
-
-
-		print_r($result);
-	
-
-
-		
-	}
+    return $result;
+    }
 }
 
-$stamps_com = new stamps_com;
+$wsdl           = "https://swsim.testing.stamps.com/swsim/swsimv57.asmx?wsdl";
+$integrationID  = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+$username       = "xxxxx-xxx";
+$password       = "xxxxxxxxxxx";
 
+$stamps_com = new stamps_com($wsdl, $integrationID, $username, $password);
 
+$shipDate   = date('Y-m-d');
+$rates      = $stamps_com->GetRates("90210", "90210", null, "10", 6, 6, 6, "Package", $shipDate, '100', null);
 
-
-
-
-
-// echo "<pre>";
-// echo "<h3>Main Output</h3>";
-// print_r($auth);
-
-
-
-// echo "<hr>";
-// echo "<pre>";
-// echo "<h3>Functions</h3>";
-// print_r($client->__getFunctions());
-
-
-// echo "<h3>Types</h3>";
-// print_r($client->__getTypes()); 
-
+echo '<pre>';
+print_r($rates);

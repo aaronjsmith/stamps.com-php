@@ -94,7 +94,7 @@ class stamps_com
     }
 }
 
-$wsdl           = "https://swsim.testing.stamps.com/swsim/swsimv57.asmx?wsdl";
+$wsdl           = "https://swsim.testing.stamps.com/swsim/swsimv66.asmx?wsdl";
 $integrationID  = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 $username       = "xxxxx-xxx";
 $password       = "xxxxxxxxxxx";
